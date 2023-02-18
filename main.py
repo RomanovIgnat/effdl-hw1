@@ -1,3 +1,5 @@
+import os
+
 import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
@@ -39,6 +41,7 @@ def main(device: str, config: dict):
         entity='ignat'
     )
 
+    os.makedirs('samples', exist_ok=True)
     for i in range(config['num_epochs']):
         loss = train_epoch(ddpm, dataloader, optim, device)
         generate_samples(ddpm, device, f"samples/{i:02d}.png")
