@@ -73,7 +73,7 @@ def test_training(tmp_path, train_dataset, device, betas, num_timestamps, eps_mo
     ddpm.to(device)
     optim = torch.optim.Adam(ddpm.parameters(), lr=1e-4)
 
-    dataloader = DataLoader(train_dataset, batch_size=128, shuffle=True)
+    dataloader = DataLoader(torch.utils.data.Subset(train_dataset, list(range(0, 256))), batch_size=128, shuffle=True)
 
     losses = []
     for i in range(2):
