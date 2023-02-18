@@ -9,6 +9,11 @@ from modeling.training import train_step, train_epoch, generate_samples
 from modeling.unet import UnetModel
 
 
+@pytest.fixture()
+def fix_seed():
+    torch.manual_seed(17)
+
+
 @pytest.fixture
 def train_dataset():
     tf = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
@@ -63,7 +68,7 @@ def test_train_on_one_batch(device, train_dataset):
         ),
     ]
 )
-def test_training(tmp_path, train_dataset, device, betas, num_timestamps, eps_model_hidden):
+def test_training(fix_seed, tmp_path, train_dataset, device, betas, num_timestamps, eps_model_hidden):
     # note: implement and test a complete training procedure (including sampling)
     ddpm = DiffusionModel(
         eps_model=UnetModel(3, 3, hidden_size=eps_model_hidden),
