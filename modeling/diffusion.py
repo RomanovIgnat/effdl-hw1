@@ -21,8 +21,8 @@ class DiffusionModel(nn.Module):
         self.criterion = nn.MSELoss()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        timestep = torch.randint(1, self.num_timesteps + 1, (x.shape[0],))
-        eps = torch.randn_like(x)
+        timestep = torch.randint(1, self.num_timesteps + 1, (x.shape[0],)).to(x.device)
+        eps = torch.randn_like(x).to(x.device)
 
         x_t = (
             self.sqrt_alphas_cumprod[timestep, None, None, None] * x
@@ -33,7 +33,7 @@ class DiffusionModel(nn.Module):
 
     def sample(self, num_samples: int, size, device) -> torch.Tensor:
 
-        x_i = torch.randn(num_samples, *size)
+        x_i = torch.randn(num_samples, *size).to(device)
 
         for i in range(self.num_timesteps, 0, -1):
             z = torch.randn(num_samples, *size) if i > 1 else 0
