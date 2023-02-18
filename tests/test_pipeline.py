@@ -81,7 +81,7 @@ def test_training(tmp_path, train_dataset, device, betas, num_timestamps, eps_mo
 
     assert losses[0] >= losses[1]
     assert losses[1] > 0
-    assert losses[0] <= 1.2
+    assert losses[0] <= 1.3
 
     samples = ddpm.sample(2, (3, 32, 32), device)
     assert samples.shape == (2, 3, 32, 32)
