@@ -5,7 +5,7 @@ from torchvision import transforms
 from torchvision.datasets import CIFAR10
 
 from modeling.diffusion import DiffusionModel
-from modeling.training import train_step
+from modeling.training import train_step, train_epoch, generate_samples
 from modeling.unet import UnetModel
 
 
@@ -41,6 +41,49 @@ def test_train_on_one_batch(device, train_dataset):
     assert loss < 0.5
 
 
-def test_training():
+@pytest.mark.parametrize(
+    [
+        'device',
+        'betas',
+        'num_timestamps',
+        'eps_model_hidden',
+    ],
+    [
+        (
+            'cuda',
+            (1e-4, 0.02),
+            100,
+            32
+        ),
+        (
+            'cpu',
+            (5e-4, 0.01),
+            100,
+            8
+        ),
+    ]
+)
+def test_training(tmp_path, train_dataset, device, betas, num_timestamps, eps_model_hidden):
     # note: implement and test a complete training procedure (including sampling)
-    pass
+    ddpm = DiffusionModel(
+        eps_model=UnetModel(3, 3, hidden_size=eps_model_hidden),
+        betas=betas,
+        num_timesteps=num_timestamps,
+    )
+    ddpm.to(device)
+    optim = torch.optim.Adam(ddpm.parameters(), lr=1e-4)
+
+    dataloader = DataLoader(train_dataset, batch_size=128, shuffle=True)
+
+    losses = []
+    for i in range(2):
+        losses.append(train_epoch(ddpm, dataloader, optim, device).data.to('cpu').numpy())
+
+    assert losses[0] >= losses[1]
+    assert losses[1] > 0
+    assert losses[0] <= 1.2
+
+    samples = ddpm.sample(2, (3, 32, 32), device)
+    assert samples.shape == (2, 3, 32, 32)
+
+    generate_samples(ddpm, device, str(tmp_path / 'test.jpg'))

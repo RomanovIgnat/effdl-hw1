@@ -5,6 +5,11 @@ from modeling.diffusion import DiffusionModel
 from modeling.unet import UnetModel
 
 
+@pytest.fixture()
+def fix_seed():
+    torch.manual_seed(17)
+
+
 @pytest.mark.parametrize(
     [
         "input_tensor",
@@ -37,7 +42,7 @@ def test_unet(input_tensor, num_timesteps):
     assert out.shape == input_tensor.shape
 
 
-def test_diffusion(num_channels=3, batch_size=4):
+def test_diffusion(fix_seed, num_channels=3, batch_size=4):
     # note: you should not need to change the thresholds or the hyperparameters
     net = UnetModel(num_channels, num_channels, hidden_size=128)
     model = DiffusionModel(eps_model=net, betas=(1e-4, 0.02), num_timesteps=20)
