@@ -35,7 +35,8 @@ def main(device: str, config: dict):
 
     wandb.init(
         project="effdl-hw1",
-        config=config
+        config=config,
+        entity='ignat'
     )
 
     for i in range(config['num_epochs']):
