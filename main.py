@@ -26,8 +26,8 @@ def main(device: str, config: dict):
     dataset = CIFAR10(
         "cifar10",
         train=True,
-        download=True,
-        transform=train_transforms,
+        download=False,
+        transform=train_transforms
     )
 
     dataloader = DataLoader(dataset, batch_size=config['batch_size'], num_workers=4, shuffle=True)
